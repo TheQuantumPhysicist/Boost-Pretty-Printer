@@ -128,6 +128,48 @@ class BoostOptional:
         else:
             return '{} is not initialized'.format(self.value.type_name)
 
+@add_printer
+class RustResult:
+    "Pretty Printer for result<>"
+    printer_name = 'RustResult'
+    min_supported_version = (1, 40, 0)
+    max_supported_version = last_supported_boost_version
+    template_name = 'Result'
+
+    def __init__(self, value):
+        self.value = value
+
+    def children(self):
+        initialized = self.value['storage_']['initialized_']
+        if initialized:
+            ok = self.value['ok_']
+            yield 'ok', ok
+            m_storage = self.value['storage_']['storage_']
+            if ok:
+                stored_type = get_basic_type(self.value.basic_type.template_argument(0))
+                stored_value = m_storage \
+                    if get_basic_type(m_storage.type) == stored_type \
+                    else reinterpret_cast(self.value['storage_']['storage_'], stored_type)
+                yield 'value', stored_value
+            else:
+                stored_type = get_basic_type(self.value.basic_type.template_argument(1))
+                stored_value = m_storage \
+                    if get_basic_type(m_storage.type) == stored_type \
+                    else reinterpret_cast(self.value['storage_']['storage_'], stored_type)
+                yield 'value', stored_value
+        else:
+            yield 'initialized', initialized
+
+    def display_hint(self):
+        return 'string'
+
+    def to_string(self):
+        ok = self.value['ok_']
+        if ok:
+            return '{} is ok'.format(self.value.type_name)
+        else:
+            return '{} is not ok'.format(self.value.type_name)
+
 
 @add_printer
 class BoostReferenceWrapper:

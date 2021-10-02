@@ -630,8 +630,9 @@ def register_printers(obj=None, boost_version=None):
         message('Detecting boost_version... ')
         boost_version = detect_boost_version()
         message('Detected boost version: {}.{}.{}'.format(*boost_version))
-    supported_printers = [printer for printer in boost_printer_list
-                          if printer.min_supported_version <= boost_version <= printer.max_supported_version]
+#    supported_printers = [printer for printer in boost_printer_list
+#                          if printer.min_supported_version <= boost_version <= printer.max_supported_version]
+    supported_printers = boost_printer_list
     if supported_printers:
         boost_printer_gen = Printer_Gen('boost')
         for printer in supported_printers:
